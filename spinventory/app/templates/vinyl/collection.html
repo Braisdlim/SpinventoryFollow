@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block title %}Mi Colección{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="display-4"><i class="fas fa-record-vinyl me-2"></i> Mi Colección</h1>
+        <a href="{{ url_for('vinyl.add') }}" class="btn btn-primary-vinyl">
+            <i class="fas fa-plus me-1"></i> Añadir Disco
+        </a>
+    </div>
+
+    <!-- Estadísticas -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card bg-dark text-white vinyl-glow">
+                <div class="card-body">
+                    <h5 class="card-title">Total Discos</h5>
+                    <p class="display-6">{{ stats.total }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-dark text-white vinyl-glow">
+                <div class="card-body">
+                    <h5 class="card-title">Género Principal</h5>
+                    <p class="display-6">{{ stats.top_genre }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-dark text-white vinyl-glow">
+                <div class="card-body">
+                    <h5 class="card-title">Década Favorita</h5>
+                    <p class="display-6">{{ stats.top_decade }}s</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lista de discos -->
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+        {% for vinyl in collection %}
+        <div class="col">
+            <div class="vinyl-card h-100">
+                <img src="{{ vinyl.cover_url or url_for('static', filename='images/default-cover.jpg') }}" 
+                     class="vinyl-cover" alt="{{ vinyl.title }}">
+                <div class="vinyl-info">
+                    <h5 class="card-title">{{ vinyl.title }}</h5>
+                    <p class="card-text text-muted">{{ vinyl.artist }}</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="badge bg-secondary">{{ vinyl.year }}</span>
+                        <div>
+                            <a href="{{ url_for('vinyl.detail', id=vinyl.id) }}" class="btn btn-sm btn-vinyl">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            <a href="{{ url_for('vinyl.edit', id=vinyl.id) }}" class="btn btn-sm btn-vinyl">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="col-12">
+            <div class="text-center py-5">
+                <i class="fas fa-record-vinyl fa-5x mb-3 text-muted"></i>
+                <h3 class="text-muted">Tu colección está vacía</h3>
+                <p class="text-muted">Comienza añadiendo tu primer disco</p>
+                <a href="{{ url_for('vinyl.add') }}" class="btn btn-primary-vinyl">
+                    <i class="fas fa-plus me-1"></i> Añadir Disco
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
