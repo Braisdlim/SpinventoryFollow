@@ -1,43 +1,115 @@
 {% extends "base.html" %}
 
+{% block title %}Añadir Disco{% endblock %}
+
 {% block content %}
-<h2 class="text-3xl font-semibold text-white mb-6">Añadir Disco</h2>
+<div class="form-container">
+    <h2>Añadir Nuevo Disco</h2>
+    <form method="POST" action="{{ url_for('records.add') }}" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="title">Título:</label>
+            <input type="text" id="title" name="title" required>
+        </div>
+        <div class="form-group">
+            <label for="artist">Artista:</label>
+            <input type="text" id="artist" name="artist" required>
+        </div>
+        <div class="form-group">
+            <label for="year">Año:</label>
+            <input type="number" id="year" name="year" required>
+        </div>
+        <div class="form-group">
+            <label for="genre">Género:</label>
+            <select id="genre" name="genre" required>
+                <option value="rock">Rock</option>
+                <option value="pop">Pop</option>
+                <option value="jazz">Jazz</option>
+                <option value="electronic">Electrónica</option>
+                <option value="classical">Clásica</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="condition">Estado:</label>
+            <select id="condition" name="condition" required>
+                <option value="new">Nuevo</option>
+                <option value="excellent">Excelente</option>
+                <option value="good">Bueno</option>
+                <option value="fair">Regular</option>
+            </select>
+        </div>
+        
+        <!-- Sección de Portada del Disco -->
+        <div class="form-group">
+            <label>Portada del Disco:</label>
+            <div id="cover-preview-container">
+                <img id="cover-preview" src="{{ url_for('static', filename='images/placeholder-cover.png') }}" 
+                     class="cover-preview" alt="Vista previa de portada">
+            </div>
+            <div class="cover-actions">
+                <button type="button" id="fetch-cover" class="btn btn-sm btn-cover">
+                    <i class="fas fa-search"></i> Buscar Portada Automáticamente
+                </button>
+                <span class="cover-or">o</span>
+                <label for="cover-upload" class="btn btn-sm btn-cover">
+                    <i class="fas fa-upload"></i> Subir Imagen
+                    <input type="file" id="cover-upload" name="cover_upload" accept="image/*" style="display: none;">
+                </label>
+            </div>
+            <input type="hidden" name="cover_url" id="cover-url">
+            <small class="cover-note">(Se buscará automáticamente al guardar si no se selecciona imagen)</small>
+        </div>
+        
+        <div class="form-actions">
+            <button type="submit" class="btn btn-submit">
+                <i class="fas fa-save"></i> Guardar Disco
+            </button>
+            <a href="{{ url_for('records.list') }}" class="btn btn-cancel">
+                <i class="fas fa-times"></i> Cancelar
+            </a>
+        </div>
+    </form>
+</div>
 
-<form method="POST" enctype="multipart/form-data" class="bg-black bg-opacity-60 p-6 rounded-xl shadow-lg max-w-xl mx-auto">
-    {{ form.hidden_tag() }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Buscar portada automáticamente
+    document.getElementById('fetch-cover').addEventListener('click', async () => {
+        const artist = document.getElementById('artist').value;
+        const title = document.getElementById('title').value;
+        
+        if (!artist || !title) {
+            alert('Por favor ingresa artista y título primero');
+            return;
+        }
 
-    <div class="mb-4">
-        {{ form.title.label(class="block text-gray-300 text-sm mb-2") }}
-        {{ form.title(class="w-full p-2 bg-gray-900 text-white border border-gray-700 rounded focus:outline-none focus:ring-2 focus:ring-green-500") }}
-    </div>
+        try {
+            const response = await fetch(`/search-cover?artist=${encodeURIComponent(artist)}&title=${encodeURIComponent(title)}`);
+            const data = await response.json();
+            
+            if (data.cover_url) {
+                document.getElementById('cover-preview').src = data.cover_url;
+                document.getElementById('cover-url').value = data.cover_url;
+            } else {
+                alert('No se encontró portada automáticamente. Puedes subir una imagen manualmente.');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Error al buscar la portada. Intenta más tarde.');
+        }
+    });
 
-    <div class="mb-4">
-        {{ form.artist.label(class="block text-gray-300 text-sm mb-2") }}
-        {{ form.artist(class="w-full p-2 bg-gray-900 text-white border border-gray-700 rounded focus:outline-none focus:ring-2 focus:ring-green-500") }}
-    </div>
-
-    <div class="mb-4">
-        {{ form.year.label(class="block text-gray-300 text-sm mb-2") }}
-        {{ form.year(class="w-full p-2 bg-gray-900 text-white border border-gray-700 rounded focus:outline-none focus:ring-2 focus:ring-green-500") }}
-    </div>
-
-    <div class="mb-4">
-        {{ form.genre.label(class="block text-gray-300 text-sm mb-2") }}
-        {{ form.genre(class="w-full p-2 bg-gray-900 text-white border border-gray-700 rounded focus:outline-none focus:ring-2 focus:ring-green-500") }}
-    </div>
-
-    <div class="mb-4">
-        {{ form.condition.label(class="block text-gray-300 text-sm mb-2") }}
-        {{ form.condition(class="w-full p-2 bg-gray-900 text-white border border-gray-700 rounded focus:outline-none focus:ring-2 focus:ring-green-500") }}
-    </div>
-
-    <div class="mb-4">
-        {{ form.image.label(class="block text-gray-300 text-sm mb-2") }}
-        {{ form.image(class="w-full text-white") }}
-    </div>
-
-    <button type="submit" class="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded transition-all">
-        Añadir Disco
-    </button>
-</form>
+    // Subir imagen manualmente
+    document.getElementById('cover-upload').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                document.getElementById('cover-preview').src = event.target.result;
+                document.getElementById('cover-url').value = ''; // Limpiar URL si había una
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+});
+</script>
 {% endblock %}

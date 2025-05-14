@@ -10,10 +10,17 @@ class User(UserMixin):
         return self.email
 
 class Record:
-    def __init__(self, title, artist, year, genre, condition, user_email):
+    def __init__(self, title, artist, year, genre, condition, user_email, cover_url=None):
         self.title = title
         self.artist = artist
         self.year = year
         self.genre = genre
         self.condition = condition
         self.user_email = user_email
+        self.cover_url = cover_url or self._generate_default_cover()
+        
+    def _generate_default_cover(self):
+        """Genera una URL de portada por defecto basada en los datos del disco"""
+        base_color = hash(self.artist + self.title) % 360  # Color único por álbum
+        return (f"https://fakeimg.pl/400x400/{base_color},128/333333,255/?text="
+                f"{self.artist[0]}+{self.title[0]}&font_size=75")

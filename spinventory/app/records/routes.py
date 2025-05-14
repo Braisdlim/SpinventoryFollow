@@ -25,17 +25,26 @@ def list():
 def add():
     if request.method == 'POST':
         try:
+            # Obtener URL de la portada (puede ser None si no se encontró)
+            cover_url = request.form.get('cover_url')
+            
             record = Record(
                 title=request.form.get('title'),
                 artist=request.form.get('artist'),
                 year=int(request.form.get('year')),
                 genre=request.form.get('genre'),
                 condition=request.form.get('condition'),
-                user_email=current_user.email
+                user_email=current_user.email,
+                cover_url=cover_url  # Añadimos el nuevo campo
             )
+            
             srp.save(record)
             flash('Disco añadido correctamente!', 'success')
             return redirect(url_for('records.list'))
+            
+        except ValueError as e:
+            flash('El año debe ser un número válido', 'error')
+            current_app.logger.error(f"ValueError in add: {str(e)}")
         except Exception as e:
             flash('Error al añadir el disco', 'error')
             current_app.logger.error(f"Add record error: {str(e)}")

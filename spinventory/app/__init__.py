@@ -3,6 +3,11 @@ from flask_login import LoginManager
 from sirope import Sirope
 from config import Config
 import redis
+from dotenv import load_dotenv
+import os
+
+# Cargar variables de entorno al inicio
+load_dotenv()
 
 # Inicialización de extensiones
 login_manager = LoginManager()
@@ -23,10 +28,18 @@ def create_app():
     # Inicialización de Sirope
     global srp
     srp = Sirope(redis_obj=redis_conn)
-    # ... resto de la configuración ...
+    
     # Configuración de Flask-Login
     login_manager.init_app(app)
     login_manager.login_view = 'auth.login'
+
+    # Configuración de Discogs (desde variables de entorno)
+    app.config['DISCOGS_KEY'] = os.getenv('DISCOGS_KEY')
+    app.config['DISCOGS_SECRET'] = os.getenv('DISCOGS_SECRET')
+    
+    # Validar configuración Discogs
+    if not app.config['DISCOGS_KEY'] or not app.config['DISCOGS_SECRET']:
+        app.logger.warning('Faltan credenciales de Discogs en .env')
 
     # Registrar blueprints
     from app.auth import auth_bp

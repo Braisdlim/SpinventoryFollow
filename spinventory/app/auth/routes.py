@@ -6,29 +6,28 @@ from app import srp
 # Definición del Blueprint
 auth_bp = Blueprint('auth', __name__)
 
-from app.auth.forms import LoginForm  # asegúrate de importar el formulario
-
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
-    form = LoginForm()
-
-    if form.validate_on_submit():
-        email = form.email.data
-        password = form.password.data
-
-        user = None
-        for u in srp.load_all(User):
-            if u.email == email and u.password == password:
-                user = u
-                break
-
-        if user:
-            login_user(user)
-            return redirect(url_for('records.list'))
-        flash('Credenciales incorrectas', 'error')
-
-    return render_template('auth/login.html', form=form)
-
+    if request.method == 'POST':
+        try:
+            email = request.form.get('email')
+            password = request.form.get('password')
+            
+            user = None
+            for u in srp.load_all(User):
+                if u.email == email and u.password == password:
+                    user = u
+                    break
+            
+            if user:
+                login_user(user)
+                return redirect(url_for('records.list'))
+            flash('Credenciales incorrectas', 'error')
+        except Exception as e:
+            flash('Error en el login', 'error')
+            current_app.logger.error(f"Login error: {str(e)}")
+    
+    return render_template('auth/login.html')
 
 @auth_bp.route('/register', methods=['GET', 'POST'])
 def register():

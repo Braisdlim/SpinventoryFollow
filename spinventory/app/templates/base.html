@@ -1,42 +1,35 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Spinventory</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.3.2/dist/tailwind.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #0d0d0d;
-            background-image: url('/static/images/vinyl-bg.png'); /* Puedes generar o subir esta imagen */
-            background-size: cover;
-            background-repeat: no-repeat;
-            background-attachment: fixed;
-            color: white;
-        }
-    </style>
+    <title>Spinventory - {% block title %}{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
-<body class="min-h-screen flex flex-col">
-    <header class="bg-black bg-opacity-80 border-b border-gray-800">
-        <div class="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
-            <h1 class="text-2xl font-semibold text-white">🎸 Spinventory</h1>
-            <nav class="space-x-6 text-sm">
-                <a href="/" class="text-gray-300 hover:text-green-400">Inicio</a>
-                <a href="/add" class="text-gray-300 hover:text-green-400">Añadir Disco</a>
-                <a href="/wishlist" class="text-gray-300 hover:text-green-400">Wishlist</a>
-                <a href="/logout" class="text-red-400 hover:text-red-600">Salir</a>
-            </nav>
-        </div>
-    </header>
-
-    <main class="flex-grow px-4 py-8 max-w-6xl mx-auto">
+<body>
+    <nav>
+        {% if current_user.is_authenticated %}
+            <a href="{{ url_for('records.list') }}">Mi Colección</a>
+            <a href="{{ url_for('records.add') }}">Añadir Disco</a>
+            <a href="{{ url_for('auth.logout') }}">Cerrar Sesión</a>
+        {% else %}
+            <a href="{{ url_for('auth.login') }}">Iniciar Sesión</a>
+            <a href="{{ url_for('auth.register') }}">Registrarse</a>
+        {% endif %}
+    </nav>
+    
+    <div class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flashes">
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+        
         {% block content %}{% endblock %}
-    </main>
-
-    <footer class="bg-black bg-opacity-80 text-gray-600 text-sm text-center py-4">
-        &copy; {{ year }} Spinventory. Todos los derechos reservados.
-    </footer>
+    </div>
 </body>
 </html>

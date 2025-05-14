@@ -1,25 +1,49 @@
 {% extends "base.html" %}
 
+{% block title %}Mi Colección{% endblock %}
+
 {% block content %}
-<h2 class="text-3xl font-semibold text-white mb-6">Tu Colección</h2>
-
-<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-    {% for record in records %}
-    <div class="bg-black bg-opacity-60 rounded-xl shadow-md overflow-hidden">
-        <img src="{{ record.image_url }}" alt="{{ record.title }}" class="w-full h-48 object-cover">
-        <div class="p-4">
-            <h3 class="text-lg text-white font-semibold">{{ record.title }}</h3>
-            <p class="text-sm text-gray-400">{{ record.artist }} &middot; {{ record.year }}</p>
-            <p class="text-sm text-gray-400 mb-2">Género: {{ record.genre }}</p>
-            <span class="inline-block px-3 py-1 text-xs rounded-full {{ 'bg-green-600' if record.condition == 'Nuevo' else 'bg-yellow-500' }} text-white">
-                {{ record.condition }}
-            </span>
+<div class="records-container">
+    <h2>Mi Colección de Discos</h2>
+    <a href="{{ url_for('records.add') }}" class="btn btn-add">
+        <i class="fas fa-plus"></i> Añadir Disco
+    </a>
+    
+    <div class="records-grid">
+        {% for record in records %}
+        <div class="record-card">
+            <!-- Portada del disco - Versión corregida -->
+            <div class="cover-container">
+                {% set placeholder_img = url_for('static', filename='images/placeholder-cover.png') %}
+                <img src="{{ record.cover_url or placeholder_img }}"
+                     class="cover-image"
+                     alt="Portada de {{ record.title }}"
+                     loading="lazy"
+                     onerror="this.onerror=null;this.src='{{ placeholder_img }}'">
+            </div>
+            
+            <!-- Detalles del disco -->
+            <div class="record-details">
+                <h3>{{ record.title }}</h3>
+                <p><strong><i class="fas fa-user"></i> Artista:</strong> {{ record.artist }}</p>
+                <p><strong><i class="fas fa-calendar"></i> Año:</strong> {{ record.year }}</p>
+                <p><strong><i class="fas fa-music"></i> Género:</strong> {{ record.genre | capitalize }}</p>
+                <p><strong><i class="fas fa-star"></i> Estado:</strong> 
+                    <span class="condition-badge condition-{{ record.condition }}">
+                        {{ record.condition | capitalize }}
+                    </span>
+                </p>
+            </div>
         </div>
+        {% else %}
+        <div class="no-records">
+            <i class="fas fa-compact-disc fa-3x"></i>
+            <p>No tienes discos en tu colección todavía.</p>
+            <a href="{{ url_for('records.add') }}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Añadir tu primer disco
+            </a>
+        </div>
+        {% endfor %}
     </div>
-    {% endfor %}
 </div>
-
-{% if not records %}
-<p class="text-gray-500 mt-4">Aún no has añadido discos a tu colección.</p>
-{% endif %}
 {% endblock %}
