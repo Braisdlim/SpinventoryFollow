@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2 class="text-3xl font-semibold text-white mb-6">Añadir Disco</h2>
+
+<form method="POST" enctype="multipart/form-data" class="bg-black bg-opacity-60 p-6 rounded-xl shadow-lg max-w-xl mx-auto">
+    {{ form.hidden_tag() }}
+
+    <div class="mb-4">
+        {{ form.title.label(class="block text-gray-300 text-sm mb-2") }}
+        {{ form.title(class="w-full p-2 bg-gray-900 text-white border border-gray-700 rounded focus:outline-none focus:ring-2 focus:ring-green-500") }}
+    </div>
+
+    <div class="mb-4">
+        {{ form.artist.label(class="block text-gray-300 text-sm mb-2") }}
+        {{ form.artist(class="w-full p-2 bg-gray-900 text-white border border-gray-700 rounded focus:outline-none focus:ring-2 focus:ring-green-500") }}
+    </div>
+
+    <div class="mb-4">
+        {{ form.year.label(class="block text-gray-300 text-sm mb-2") }}
+        {{ form.year(class="w-full p-2 bg-gray-900 text-white border border-gray-700 rounded focus:outline-none focus:ring-2 focus:ring-green-500") }}
+    </div>
+
+    <div class="mb-4">
+        {{ form.genre.label(class="block text-gray-300 text-sm mb-2") }}
+        {{ form.genre(class="w-full p-2 bg-gray-900 text-white border border-gray-700 rounded focus:outline-none focus:ring-2 focus:ring-green-500") }}
+    </div>
+
+    <div class="mb-4">
+        {{ form.condition.label(class="block text-gray-300 text-sm mb-2") }}
+        {{ form.condition(class="w-full p-2 bg-gray-900 text-white border border-gray-700 rounded focus:outline-none focus:ring-2 focus:ring-green-500") }}
+    </div>
+
+    <div class="mb-4">
+        {{ form.image.label(class="block text-gray-300 text-sm mb-2") }}
+        {{ form.image(class="w-full text-white") }}
+    </div>
+
+    <button type="submit" class="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded transition-all">
+        Añadir Disco
+    </button>
+</form>
+{% endblock %}
