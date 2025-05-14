@@ -1,23 +1,22 @@
 import requests
-from flask import current_app
+from config import Config
 
 class DiscogsService:
     @staticmethod
-    def search_cover(artist, title):
+    def get_cover(album: str, artist: str) -> str:
         try:
             response = requests.get(
                 "https://api.discogs.com/database/search",
                 params={
-                    "q": f"{artist} {title}",
-                    "type": "release",
-                    "key": current_app.config['DISCOGS_KEY'],
-                    "secret": current_app.config['DISCOGS_SECRET']
+                    "release_title": album,
+                    "artist": artist,
+                    "token": Config.DISCOGS_TOKEN,
                 },
-                headers={"User-Agent": "Spinventory/1.0"}
+                timeout=10
             )
             response.raise_for_status()
             data = response.json()
             return data["results"][0]["cover_image"] if data.get("results") else None
-        except Exception as e:
-            current_app.logger.error(f"Error en Discogs: {str(e)}")
+        except (requests.RequestException, KeyError) as e:
+            print(f"Error al llamar a Discogs: {e}")
             return None
