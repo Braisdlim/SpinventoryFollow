@@ -26,36 +26,36 @@ def list():
 def add():
     if request.method == 'POST':
         try:
-            # Búsqueda automática de portada si no se proporciona URL
-            cover_url = request.form.get('cover_url')
-            if not cover_url:
-                cover_url = DiscogsService.search_cover(
-                    artist=request.form.get('artist'),
-                    title=request.form.get('title')
-                )
-                if not cover_url:
-                    current_app.logger.info("No se encontró portada automática")
-
-            record = Record(
-                title=request.form.get('title'),
-                artist=request.form.get('artist'),
-                year=int(request.form.get('year')),
-                genre=request.form.get('genre'),
-                condition=request.form.get('condition'),
-                user_email=current_user.email,
-                cover_url=cover_url
-            )
+            # Obtener datos del formulario
+            title = request.form['title']
+            artist = request.form['artist']
+            year = int(request.form['year'])
+            genre = request.form['genre']
+            condition = request.form['condition']
             
+            # Manejo de la portada (prioriza manual > automática > placeholder)
+            cover_url = request.form.get('cover_url')
+            if not cover_url:  # Búsqueda automática solo si no hay URL manual
+                cover_url = DiscogsService.search_cover(artist, title)
+            
+            # Crear y guardar el registro
+            record = Record(
+                title=title,
+                artist=artist,
+                year=year,
+                genre=genre,
+                condition=condition,
+                user_email=current_user.email,
+                cover_url=cover_url  # Esto nunca será None
+            )
             srp.save(record)
+            
             flash('Disco añadido correctamente!', 'success')
             return redirect(url_for('records.list'))
             
-        except ValueError as e:
-            flash('El año debe ser un número válido', 'error')
-            current_app.logger.error(f"ValueError in add: {str(e)}")
         except Exception as e:
-            flash('Error al añadir el disco', 'error')
-            current_app.logger.error(f"Add record error: {str(e)}")
+            current_app.logger.error(f"Error al añadir disco: {str(e)}")
+            flash('Error al guardar el disco', 'error')
     
     return render_template('records/add.html')
 

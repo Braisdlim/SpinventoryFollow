@@ -1,5 +1,4 @@
 import requests
-import os
 from flask import current_app
 
 class DiscogsService:
@@ -20,5 +19,5 @@ class DiscogsService:
             data = response.json()
             return data["results"][0]["cover_image"] if data.get("results") else None
         except Exception as e:
-            current_app.logger.error(f"Discogs error: {str(e)}")
+            current_app.logger.error(f"Error en Discogs: {str(e)}")
             return None
