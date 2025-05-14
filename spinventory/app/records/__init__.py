@@ -1,3 +1,5 @@
+from flask import Blueprint
 from .routes import records_bp
+from ..services.discogs_service import DiscogsService  # Añade esta línea
 
-__all__ = ['records_bp']
+# ... resto del código ...

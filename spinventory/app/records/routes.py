@@ -1,7 +1,8 @@
-from flask import Blueprint, render_template, redirect, url_for, flash, request, current_app
+from flask import Blueprint, render_template, redirect, url_for, flash, request, current_app, jsonify
 from flask_login import login_required, current_user
 from app.records.models import Record
 from app import srp
+from app.services.discogs_service import DiscogsService  # Nueva importación
 
 # Definición del Blueprint
 records_bp = Blueprint('records', __name__)
@@ -25,9 +26,16 @@ def list():
 def add():
     if request.method == 'POST':
         try:
-            # Obtener URL de la portada (puede ser None si no se encontró)
+            # Búsqueda automática de portada si no se proporciona URL
             cover_url = request.form.get('cover_url')
-            
+            if not cover_url:
+                cover_url = DiscogsService.search_cover(
+                    artist=request.form.get('artist'),
+                    title=request.form.get('title')
+                )
+                if not cover_url:
+                    current_app.logger.info("No se encontró portada automática")
+
             record = Record(
                 title=request.form.get('title'),
                 artist=request.form.get('artist'),
@@ -35,7 +43,7 @@ def add():
                 genre=request.form.get('genre'),
                 condition=request.form.get('condition'),
                 user_email=current_user.email,
-                cover_url=cover_url  # Añadimos el nuevo campo
+                cover_url=cover_url
             )
             
             srp.save(record)
@@ -50,3 +58,25 @@ def add():
             current_app.logger.error(f"Add record error: {str(e)}")
     
     return render_template('records/add.html')
+
+@records_bp.route('/search-cover')
+@login_required
+def search_cover():
+    """Endpoint para búsqueda AJAX de portadas"""
+    try:
+        artist = request.args.get('artist')
+        title = request.args.get('title')
+        
+        if not artist or not title:
+            return jsonify({"error": "Artista y título requeridos"}), 400
+            
+        cover_url = DiscogsService.search_cover(artist, title)
+        
+        if cover_url:
+            return jsonify({"cover_url": cover_url})
+        else:
+            return jsonify({"error": "No se encontró portada"}), 404
+            
+    except Exception as e:
+        current_app.logger.error(f"Error en búsqueda de portada: {str(e)}")
+        return jsonify({"error": "Error en el servidor"}), 500
