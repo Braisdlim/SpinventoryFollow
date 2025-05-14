@@ -1,0 +1,104 @@
+/* Estilos generales */
+body {
+    background-color: #000;
+    color: #f8f9fa;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex: 1;
+}
+
+/* Navbar personalizada */
+.navbar {
+    border-bottom: 1px solid #333;
+}
+
+.navbar-brand {
+    font-family: 'Montserrat', sans-serif;
+    letter-spacing: 1px;
+}
+
+/* Tarjetas de vinilos */
+.vinyl-card {
+    background-color: #1a1a1a;
+    border: 1px solid #333;
+    border-radius: 8px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    overflow: hidden;
+}
+
+.vinyl-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+}
+
+.vinyl-cover {
+    height: 200px;
+    object-fit: cover;
+    width: 100%;
+}
+
+.vinyl-info {
+    padding: 1rem;
+}
+
+/* Botones personalizados */
+.btn-vinyl {
+    background-color: #6c757d;
+    border: none;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    transition: all 0.3s;
+}
+
+.btn-vinyl:hover {
+    background-color: #5a6268;
+    color: white;
+}
+
+.btn-primary-vinyl {
+    background-color: #d63384;
+}
+
+.btn-primary-vinyl:hover {
+    background-color: #b02a6f;
+}
+
+/* Efectos especiales */
+.vinyl-glow {
+    position: relative;
+}
+
+.vinyl-glow::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at center, rgba(214, 51, 132, 0.3) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.vinyl-glow:hover::after {
+    opacity: 1;
+}
+
+/* Formularios */
+.form-control {
+    background-color: #1a1a1a;
+    border: 1px solid #333;
+    color: #f8f9fa;
+}
+
+.form-control:focus {
+    background-color: #1a1a1a;
+    color: #f8f9fa;
+    border-color: #d63384;
+    box-shadow: 0 0 0 0.25rem rgba(214, 51, 132, 0.25);
+}
